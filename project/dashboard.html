@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>界面三 · 电商销售管理 + 可视化</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#07071a;--card:#0f0f2a;--card2:#15153a;--border:rgba(255,255,255,0.06);--amber:#f59e0b;--red:#ef4444;--amber-glow:rgba(245,158,11,0.15);--text:#e5e7eb;--muted:#6b7280;--success:#22c55e;--purple:#8b5cf6;--blue:#3b82f6;--cyan:#06b6d4}
+body{font-family:'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* Nav */
+.topnav{position:sticky;top:0;z-index:100;background:rgba(7,7,26,0.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:60px}
+.topnav .logo{font-size:1.2rem;font-weight:700;display:flex;align-items:center;gap:8px}
+.topnav .logo span{background:linear-gradient(135deg,var(--amber),var(--red));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-right{display:flex;gap:1rem;align-items:center}
+.back-link{color:var(--amber);text-decoration:none;font-size:0.85rem}
+
+/* Dashboard */
+.dashboard{padding:1.5rem 2rem;max-width:1600px;margin:0 auto}
+.page-title{font-size:1.5rem;color:#fff;margin-bottom:0.3rem}
+.page-sub{color:var(--muted);font-size:0.85rem;margin-bottom:1.5rem}
+
+/* KPI Row */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.3rem;position:relative;overflow:hidden}
+.kpi::after{content:'';position:absolute;top:0;right:0;width:80px;height:80px;border-radius:50%;filter:blur(40px);opacity:0.15}
+.kpi:nth-child(1)::after{background:var(--amber)}
+.kpi:nth-child(2)::after{background:var(--success)}
+.kpi:nth-child(3)::after{background:var(--purple)}
+.kpi:nth-child(4)::after{background:var(--cyan)}
+.kpi .label{font-size:0.8rem;color:var(--muted);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.kpi .value{font-size:1.8rem;font-weight:800;color:#fff}
+.kpi .change{font-size:0.78rem;margin-top:6px;display:flex;align-items:center;gap:4px}
+.kpi .change.up{color:var(--success)}
+.kpi .change.down{color:var(--red)}
+.kpi .sparkline{position:absolute;bottom:0;right:0;width:100px;height:40px;opacity:0.3}
+
+/* Charts Grid */
+.charts-grid{display:grid;grid-template-columns:2fr 1fr;gap:1rem;margin-bottom:1.5rem}
+.chart-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.5rem}
+.chart-card h3{color:#fff;font-size:1rem;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center}
+.chart-card h3 .period{font-size:0.78rem;color:var(--muted);font-weight:400}
+.chart-wrap{height:260px;position:relative}
+
+/* Bottom Grid */
+.bottom-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:2rem}
+
+/* Platform Links */
+.platform-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.5rem}
+.platform-card h3{color:#fff;font-size:1rem;margin-bottom:1rem}
+.platform-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.03)}
+.platform-item:last-child{border:none}
+.platform-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+.taobao-bg{background:rgba(255,80,0,0.15)}
+.xianyu-bg{background:rgba(0,160,255,0.15)}
+.wechat-bg{background:rgba(34,197,94,0.15)}
+.platform-info{flex:1}
+.platform-info .name{font-size:0.9rem;color:#fff}
+.platform-info .sub{font-size:0.78rem;color:var(--muted)}
+.platform-status{font-size:0.78rem;padding:3px 10px;border-radius:10px}
+.status-active{background:rgba(34,197,94,0.12);color:var(--success)}
+.status-paused{background:rgba(245,158,11,0.12);color:var(--amber)}
+
+/* Order Table */
+.orders-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.5rem;grid-column:span 2}
+.orders-card h3{color:#fff;font-size:1rem;margin-bottom:1rem;display:flex;justify-content:space-between}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:10px 14px;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);border-bottom:1px solid var(--border)}
+td{padding:10px 14px;font-size:0.85rem;border-bottom:1px solid rgba(255,255,255,0.03)}
+tr:hover td{background:rgba(255,255,255,0.015)}
+.order-id{color:var(--cyan);font-family:monospace;font-size:0.8rem}
+.platform-tag{padding:3px 8px;border-radius:6px;font-size:0.72rem;font-weight:500}
+.tag-taobao{background:rgba(255,80,0,0.12);color:#ff6a00}
+.tag-xianyu{background:rgba(0,160,255,0.12);color:#00a0ff}
+.tag-wechat{background:rgba(34,197,94,0.12);color:#22c55e}
+.amount{color:var(--amber);font-weight:600}
+.order-status{font-size:0.78rem}
+.paid{color:var(--success)}
+.pending-pay{color:var(--amber)}
+.refund{color:var(--red)}
+
+/* Money Flow */
+.flow-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.5rem}
+.flow-card h3{color:#fff;font-size:1rem;margin-bottom:1rem}
+.flow-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.03)}
+.flow-item:last-child{border:none}
+.flow-label{display:flex;align-items:center;gap:8px;font-size:0.88rem}
+.flow-dot{width:8px;height:8px;border-radius:50%}
+.flow-amount{font-weight:600;font-size:0.9rem}
+.flow-positive{color:var(--success)}
+.flow-negative{color:var(--red)}
+.flow-total{margin-top:0.8rem;padding-top:0.8rem;border-top:2px solid var(--border);display:flex;justify-content:space-between;font-weight:700;font-size:1rem;color:#fff}
+
+/* Responsive */
+@media(max-width:1200px){.kpi-row{grid-template-columns:repeat(2,1fr)}.charts-grid{grid-template-columns:1fr}.bottom-grid{grid-template-columns:1fr}.orders-card{grid-column:span 1}}
+@media(max-width:768px){.kpi-row{grid-template-columns:1fr}.dashboard{padding:1rem}}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="logo"> <span>电商销售可视化</span></div>
+  <div class="nav-right">
+    <span style="font-size:0.85rem;color:var(--muted)">数据更新：2026-05-28 14:30</span>
+    <a class="back-link" href="index.html">← 返回入口</a>
+  </div>
+</nav>
+
+<div class="dashboard">
+  <h1 class="page-title">销售数据大屏</h1>
+  <p class="page-sub">多平台销售数据实时追踪 · 淘宝 / 闲鱼 / 微信</p>
+
+  <!-- KPI Cards -->
+  <div class="kpi-row">
+    <div class="kpi">
+      <div class="label">  今日收入</div>
+      <div class="value">¥1,286</div>
+      <div class="change up">↑ 18.5% 较昨日</div>
+    </div>
+    <div class="kpi">
+      <div class="label">  本月收入</div>
+      <div class="value">¥28,650</div>
+      <div class="change up">↑ 32.1% 较上月</div>
+    </div>
+    <div class="kpi">
+      <div class="label">  今日订单</div>
+      <div class="value">23</div>
+      <div class="change up">↑ 5 单 较昨日</div>
+    </div>
+    <div class="kpi">
+      <div class="label">  累计客户</div>
+      <div class="value">1,847</div>
+      <div class="change up">↑ 12 新增</div>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="charts-grid">
+    <div class="chart-card">
+      <h3>收入趋势 <span class="period">近30天</span></h3>
+      <div class="chart-wrap"><canvas id="revenueChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h3>平台占比</h3>
+      <div class="chart-wrap"><canvas id="platformChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Bottom -->
+  <div class="bottom-grid">
+    <!-- Platform Links -->
+    <div class="platform-card">
+      <h3>店铺渠道</h3>
+      <div class="platform-item">
+        <div class="platform-icon taobao-bg"> </div>
+        <div class="platform-info">
+          <div class="name">淘宝店铺：资源精选馆</div>
+          <div class="sub">在售商品 86 · 月销 342</div>
+        </div>
+        <span class="platform-status status-active">营业中</span>
+      </div>
+      <div class="platform-item">
+        <div class="platform-icon xianyu-bg"> </div>
+        <div class="platform-info">
+          <div class="name">闲鱼账号：精选资源铺</div>
+          <div class="sub">在售商品 124 · 月销 567</div>
+        </div>
+        <span class="platform-status status-active">营业中</span>
+      </div>
+      <div class="platform-item">
+        <div class="platform-icon wechat-bg"> </div>
+        <div class="platform-info">
+          <div class="name">微信小程序：资源宝</div>
+          <div class="sub">商品 52 · 月销 89</div>
+        </div>
+        <span class="platform-status status-paused">维护中</span>
+      </div>
+    </div>
+
+    <!-- Money Flow -->
+    <div class="flow-card">
+      <h3>资金流向（本月）</h3>
+      <div class="flow-item">
+        <span class="flow-label"><span class="flow-dot" style="background:#f97316"></span>淘宝收入</span>
+        <span class="flow-amount flow-positive">+¥15,230</span>
+      </div>
+      <div class="flow-item">
+        <span class="flow-label"><span class="flow-dot" style="background:#3b82f6"></span>闲鱼收入</span>
+        <span class="flow-amount flow-positive">+¥10,880</span>
+      </div>
+      <div class="flow-item">
+        <span class="flow-label"><span class="flow-dot" style="background:#22c55e"></span>微信收入</span>
+        <span class="flow-amount flow-positive">+¥2,540</span>
+      </div>
+      <div class="flow-item">
+        <span class="flow-label"><span class="flow-dot" style="background:#ef4444"></span>平台手续费</span>
+        <span class="flow-amount flow-negative">-¥1,424</span>
+      </div>
+      <div class="flow-item">
+        <span class="flow-label"><span class="flow-dot" style="background:#ef4444"></span>网盘会员费</span>
+        <span class="flow-amount flow-negative">-¥300</span>
+      </div>
+      <div class="flow-item">
+        <span class="flow-label"><span class="flow-dot" style="background:#ef4444"></span>推广费用</span>
+        <span class="flow-amount flow-negative">-¥2,000</span>
+      </div>
+      <div class="flow-total">
+        <span>本月净利润</span>
+        <span style="color:var(--success)">¥24,926</span>
+      </div>
+    </div>
+
+    <!-- Category Performance -->
+    <div class="chart-card">
+      <h3>品类销售 TOP5</h3>
+      <div class="chart-wrap"><canvas id="categoryChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Recent Orders -->
+  <div class="orders-card">
+    <h3>最近订单 <span style="font-size:0.8rem;color:var(--muted);font-weight:400">实时更新</span></h3>
+    <table>
+      <thead>
+        <tr><th>订单号</th><th>商品</th><th>平台</th><th>金额</th><th>状态</th><th>时间</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="order-id">#TB20260528001</td>
+          <td>Figma设计资源合集</td>
+          <td><span class="platform-tag tag-taobao">淘宝</span></td>
+          <td class="amount">¥9.9</td>
+          <td class="order-status paid">✓ 已支付</td>
+          <td style="color:var(--muted)">2分钟前</td>
+        </tr>
+        <tr>
+          <td class="order-id">#XY20260528012</td>
+          <td>Python机器学习教程</td>
+          <td><span class="platform-tag tag-xianyu">闲鱼</span></td>
+          <td class="amount">¥15.0</td>
+          <td class="order-status paid">✓ 已支付</td>
+          <td style="color:var(--muted)">8分钟前</td>
+        </tr>
+        <tr>
+          <td class="order-id">#TB20260528002</td>
+          <td>PR转场特效包</td>
+          <td><span class="platform-tag tag-taobao">淘宝</span></td>
+          <td class="amount">¥19.9</td>
+          <td class="order-status paid">✓ 已支付</td>
+          <td style="color:var(--muted)">15分钟前</td>
+        </tr>
+        <tr>
+          <td class="order-id">#XY20260528013</td>
+          <td>字体合集 1000+</td>
+          <td><span class="platform-tag tag-xianyu">闲鱼</span></td>
+          <td class="amount">¥5.9</td>
+          <td class="order-status pending-pay">⏳ 待支付</td>
+          <td style="color:var(--muted)">22分钟前</td>
+        </tr>
+        <tr>
+          <td class="order-id">#WC20260528003</td>
+          <td>商业PPT模板 50套</td>
+          <td><span class="platform-tag tag-wechat">微信</span></td>
+          <td class="amount">¥12.0</td>
+          <td class="order-status paid">✓ 已支付</td>
+          <td style="color:var(--muted)">35分钟前</td>
+        </tr>
+        <tr>
+          <td class="order-id">#TB20260528003</td>
+          <td>Adobe全家桶安装包</td>
+          <td><span class="platform-tag tag-taobao">淘宝</span></td>
+          <td class="amount">¥29.9</td>
+          <td class="order-status refund">✕ 已退款</td>
+          <td style="color:var(--muted)">1小时前</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+// Revenue Chart
+const revCtx = document.getElementById('revenueChart').getContext('2d');
+const days = Array.from({length:30},(_,i)=>`${5+Math.floor(i/3)}-${(i%30+1).toString().padStart(2,'0')}`);
+const revenueData = [520,680,890,750,920,1100,860,950,1200,1050,780,1350,1100,1420,1280,980,1150,1500,1320,1680,1450,1100,1380,1620,1750,1280,1580,1920,1650,1286];
+const gradient = revCtx.createLinearGradient(0,0,0,260);
+gradient.addColorStop(0,'rgba(245,158,11,0.3)');
+gradient.addColorStop(1,'rgba(245,158,11,0)');
+new Chart(revCtx,{
+  type:'line',
+  data:{labels:days,datasets:[{label:'收入(¥)',data:revenueData,borderColor:'#f59e0b',backgroundColor:gradient,fill:true,tension:0.4,pointRadius:0,pointHoverRadius:6,borderWidth:2}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(255,255,255,0.03)'},ticks:{color:'#6b7280',font:{size:10},maxTicksLimit:10}},y:{grid:{color:'rgba(255,255,255,0.03)'},ticks:{color:'#6b7280',font:{size:10},callback:v=>'¥'+v}}}}
+});
+
+// Platform Pie Chart
+const platCtx = document.getElementById('platformChart').getContext('2d');
+new Chart(platCtx,{
+  type:'doughnut',
+  data:{labels:['淘宝','闲鱼','微信'],datasets:[{data:[53,38,9],backgroundColor:['#f97316','#3b82f6','#22c55e'],borderColor:'#0f0f2a',borderWidth:3,hoverOffset:8}]},
+  options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{position:'bottom',labels:{color:'#9ca3af',padding:12,font:{size:11}}}}}
+});
+
+// Category Bar Chart
+const catCtx = document.getElementById('categoryChart').getContext('2d');
+new Chart(catCtx,{
+  type:'bar',
+  data:{labels:['设计素材','视频模板','源码','文档教程','字体'],datasets:[{label:'销量',data:[286,245,198,167,134],backgroundColor:['rgba(139,92,246,0.6)','rgba(244,63,94,0.6)','rgba(34,197,94,0.6)','rgba(59,130,246,0.6)','rgba(6,182,212,0.6)'],borderRadius:8,borderSkipped:false}]},
+  options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(255,255,255,0.03)'},ticks:{color:'#6b7280',font:{size:10}}},y:{grid:{display:false},ticks:{color:'#e5e7eb',font:{size:11}}}}}
+});
+</script>
+</body>
+</html>

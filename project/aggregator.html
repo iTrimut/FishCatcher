@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>界面一 · 资源聚合导航站</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a1a;--card:#12122a;--border:rgba(255,255,255,0.06);--primary:#3b82f6;--primary-glow:rgba(59,130,246,0.2);--accent:#06b6d4;--text:#e5e7eb;--muted:#6b7280;--hover:rgba(255,255,255,0.04)}
+body{font-family:'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* Nav */
+.topnav{position:sticky;top:0;z-index:100;background:rgba(10,10,26,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:60px}
+.topnav .logo{font-size:1.2rem;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px}
+.topnav .logo span{background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-links{display:flex;gap:1.5rem}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:0.9rem;transition:color 0.2s}
+.nav-links a:hover,.nav-links a.active{color:#fff}
+.back-link{color:var(--primary);text-decoration:none;font-size:0.85rem;display:flex;align-items:center;gap:4px}
+
+/* Hero */
+.hero{text-align:center;padding:4rem 2rem 2rem;position:relative}
+.hero h1{font-size:2.4rem;font-weight:800;margin-bottom:0.8rem}
+.hero h1 em{font-style:normal;background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{color:var(--muted);max-width:600px;margin:0 auto 2rem;line-height:1.7}
+
+/* Search */
+.search-box{max-width:600px;margin:0 auto 1rem;position:relative}
+.search-box input{width:100%;padding:14px 20px 14px 48px;background:var(--card);border:1px solid var(--border);border-radius:14px;color:#fff;font-size:1rem;outline:none;transition:border 0.3s}
+.search-box input:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-glow)}
+.search-box .icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:1.2rem}
+
+/* Stats */
+.stats{display:flex;gap:2rem;justify-content:center;margin:2rem 0;flex-wrap:wrap}
+.stat{text-align:center}
+.stat .num{font-size:1.8rem;font-weight:800;color:#fff}
+.stat .label{font-size:0.8rem;color:var(--muted);margin-top:2px}
+
+/* Filters */
+.filters{display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;padding:0 2rem;margin-bottom:2rem}
+.filter-btn{padding:8px 18px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:0.85rem;cursor:pointer;transition:all 0.2s}
+.filter-btn:hover,.filter-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+
+/* Grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.2rem;padding:0 2rem 4rem;max-width:1400px;margin:0 auto}
+.resource-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.5rem;transition:all 0.3s;cursor:pointer;position:relative;overflow:hidden}
+.resource-card:hover{transform:translateY(-4px);border-color:rgba(59,130,246,0.3);box-shadow:0 8px 30px rgba(0,0,0,0.3)}
+.resource-card .badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:0.7rem;font-weight:600;margin-bottom:0.8rem}
+.badge-design{background:rgba(168,85,247,0.15);color:#c084fc}
+.badge-code{background:rgba(34,197,94,0.15);color:#4ade80}
+.badge-video{background:rgba(244,63,94,0.15);color:#fb7185}
+.badge-doc{background:rgba(59,130,246,0.15);color:#60a5fa}
+.badge-tool{background:rgba(245,158,11,0.15);color:#fbbf24}
+.badge-font{background:rgba(6,182,212,0.15);color:#22d3ee}
+.badge-template{background:rgba(236,72,153,0.15);color:#f472b6}
+.badge-other{background:rgba(107,114,128,0.15);color:#9ca3af}
+.resource-card h3{font-size:1.05rem;color:#fff;margin-bottom:0.5rem}
+.resource-card p{color:var(--muted);font-size:0.85rem;line-height:1.6;margin-bottom:1rem}
+.resource-card .meta{display:flex;justify-content:space-between;align-items:center;font-size:0.78rem;color:var(--muted)}
+.resource-card .meta .size{padding:3px 8px;background:rgba(255,255,255,0.04);border-radius:8px}
+.resource-card .meta .date{opacity:0.7}
+.resource-card .actions{display:flex;gap:0.5rem;margin-top:1rem}
+.btn-sm{padding:6px 14px;border-radius:8px;border:none;font-size:0.8rem;cursor:pointer;transition:all 0.2s}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:#2563eb}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--muted)}
+.btn-outline:hover{border-color:var(--primary);color:var(--primary)}
+.resource-card .cloud-icon{position:absolute;top:1rem;right:1rem;font-size:1.2rem;opacity:0.3}
+
+/* Modal */
+.modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:200;justify-content:center;align-items:center}
+.modal-overlay.show{display:flex}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2rem;max-width:500px;width:90%;position:relative}
+.modal h2{color:#fff;margin-bottom:1rem}
+.modal .close{position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--muted);font-size:1.5rem;cursor:pointer}
+.modal .link-box{background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:10px;padding:12px;font-family:monospace;font-size:0.85rem;color:var(--accent);word-break:break-all;margin:1rem 0}
+.modal .copy-btn{width:100%;padding:12px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-size:0.95rem;cursor:pointer;transition:background 0.2s}
+.modal .copy-btn:hover{background:#2563eb}
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:#22c55e;color:#fff;padding:10px 24px;border-radius:10px;font-size:0.9rem;z-index:300;display:none;animation:slideUp 0.3s}
+@keyframes slideUp{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+/* Responsive */
+@media(max-width:768px){.hero h1{font-size:1.8rem}.grid{grid-template-columns:1fr;padding:0 1rem 4rem}.stats{gap:1rem}.topnav{padding:0 1rem}}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="logo"> <span>资源聚合站</span></div>
+  <div class="nav-links">
+    <a href="#" class="active">首页</a>
+    <a href="#categories">分类</a>
+    <a href="#latest">最新</a>
+    <a class="back-link" href="index.html">← 返回入口</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <h1>发现优质<em>免费资源</em></h1>
+  <p>聚合全网免费共享资源，涵盖设计素材、开发工具、视频模板等，搜索即用，原链接直达</p>
+  <div class="search-box">
+    <span class="icon"> </span>
+    <input type="text" id="searchInput" placeholder="搜索资源名称、分类、关键词..." oninput="filterResources()">
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="num" id="totalCount">0</div><div class="label">总资源数</div></div>
+    <div class="stat"><div class="num" id="catCount">0</div><div class="label">分类数</div></div>
+    <div class="stat"><div class="num" id="todayCount">0</div><div class="label">今日新增</div></div>
+  </div>
+</section>
+
+<div class="filters" id="filterBar">
+  <button class="filter-btn active" onclick="setFilter('all',this)">全部</button>
+  <button class="filter-btn" onclick="setFilter('设计素材',this)">设计素材</button>
+  <button class="filter-btn" onclick="setFilter('源码',this)">源码</button>
+  <button class="filter-btn" onclick="setFilter('视频模板',this)">视频模板</button>
+  <button class="filter-btn" onclick="setFilter('文档教程',this)">文档教程</button>
+  <button class="filter-btn" onclick="setFilter('工具软件',this)">工具软件</button>
+  <button class="filter-btn" onclick="setFilter('字体',this)">字体</button>
+  <button class="filter-btn" onclick="setFilter('PPT模板',this)">PPT模板</button>
+</div>
+
+<div class="grid" id="resourceGrid"></div>
+
+<!-- Detail Modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <button class="close" onclick="closeModal()">&times;</button>
+    <h2 id="modalTitle"></h2>
+    <p id="modalDesc" style="color:var(--muted);margin-bottom:1rem"></p>
+    <div style="display:flex;gap:0.8rem;margin-bottom:1rem;flex-wrap:wrap" id="modalTags"></div>
+    <div class="link-box" id="modalLink"></div>
+    <button class="copy-btn" onclick="copyLink()">复制链接</button>
+  </div>
+</div>
+
+<div class="toast" id="toast">链接已复制！</div>
+
+<script>
+// 模拟资源数据 — 实际项目中对接后端API或爬虫数据
+const resources = [
+  {id:1,name:"Figma 设计资源合集 2026",cat:"设计素材",desc:"包含500+高质量Figma组件库、UI Kit、图标库，适用于Web和移动端设计",size:"2.3 GB",date:"2026-05-28",link:"https://pan.baidu.com/s/xxxxx_design",downloads:1520},
+  {id:2,name:"React + Next.js 全栈模板",cat:"源码",desc:"完整的全栈项目模板，集成Tailwind CSS、Prisma ORM、Auth认证",size:"850 MB",date:"2026-05-27",link:"https://pan.baidu.com/s/xxxxx_react",downloads:892},
+  {id:3,name:"Premiere Pro 转场特效包",cat:"视频模板",desc:"200+专业转场效果，支持4K分辨率，一键导入PR",size:"4.1 GB",date:"2026-05-27",link:"https://pan.baidu.com/s/xxxxx_premiere",downloads:2341},
+  {id:4,name:"Python 机器学习实战教程",cat:"文档教程",desc:"从入门到实战，包含视频课程+代码+数据集，涵盖TensorFlow/PyTorch",size:"12 GB",date:"2026-05-26",link:"https://pan.baidu.com/s/xxxxx_python",downloads:3102},
+  {id:5,name:"Adobe 全家桶 2026 破解版",cat:"工具软件",desc:"Photoshop、Illustrator、After Effects等全套Adobe工具，含安装教程",size:"18 GB",date:"2026-05-26",link:"https://pan.baidu.com/s/xxxxx_adobe",downloads:5620},
+  {id:6,name:"1000+ 免费商用字体合集",cat:"字体",desc:"思源系列、阿里巴巴普惠体、站酷系列等，均支持商用",size:"3.2 GB",date:"2026-05-25",link:"https://pan.baidu.com/s/xxxxx_fonts",downloads:4210},
+  {id:7,name:"商业计划书 PPT 模板 50套",cat:"PPT模板",desc:"高端商务风格，适合融资路演、年度汇报、项目提案",size:"1.5 GB",date:"2026-05-25",link:"https://pan.baidu.com/s/xxxxx_ppt",downloads:1890},
+  {id:8,name:"3D 建模素材库 - Blender",cat:"设计素材",desc:"500+高质量3D模型，FBX/OBJ格式，适用于游戏和影视制作",size:"15 GB",date:"2026-05-24",link:"https://pan.baidu.com/s/xxxxx_3d",downloads:980},
+  {id:9,name:"Vue3 + TypeScript 企业级项目",cat:"源码",desc:"完整的后台管理系统，集成权限管理、动态路由、图表可视化",size:"620 MB",date:"2026-05-24",link:"https://pan.baidu.com/s/xxxxx_vue",downloads:1456},
+  {id:10,name:"DaVinci Resolve 调色预设",cat:"视频模板",desc:"电影级调色LUT预设300+，适配各类场景氛围",size:"5.8 GB",date:"2026-05-23",link:"https://pan.baidu.com/s/xxxxx_davinci",downloads:1678},
+  {id:11,name:"Midjourney 提示词大全",cat:"文档教程",desc:"10000+精选Prompt，涵盖人物、风景、建筑、产品等各类场景",size:"50 MB",date:"2026-05-23",link:"https://pan.baidu.com/s/xxxxx_mj",downloads:6780},
+  {id:12,name:"Sketch UI Kit 移动端",cat:"设计素材",desc:"iOS和Android双平台UI组件库，暗色/亮色双主题",size:"890 MB",date:"2026-05-22",link:"https://pan.baidu.com/s/xxxxx_sketch",downloads:765},
+  {id:13,name:"Excel 数据分析模板 100套",cat:"PPT模板",desc:"财务报表、销售看板、库存管理等各类Excel模板",size:"200 MB",date:"2026-05-22",link:"https://pan.baidu.com/s/xxxxx_excel",downloads:3450},
+  {id:14,name:"Node.js 后端最佳实践",cat:"源码",desc:"Express + Koa + NestJS 三个框架的实战项目源码",size:"1.2 GB",date:"2026-05-21",link:"https://pan.baidu.com/s/xxxxx_node",downloads:1230},
+  {id:15,name:"Cinema 4D 动效教程",cat:"文档教程",desc:"从基础建模到高级动效，含工程文件和素材",size:"8 GB",date:"2026-05-21",link:"https://pan.baidu.com/s/xxxxx_c4d",downloads:567},
+  {id:16,name:"Notion 模板库 200+",cat:"工具软件",desc:"个人管理、项目跟踪、知识库、日记等各类Notion模板",size:"30 MB",date:"2026-05-20",link:"https://pan.baidu.com/s/xxxxx_notion",downloads:2890},
+  {id:17,name:"手写字体合集 50款",cat:"字体",desc:"中文手写体、英文手写体，适合海报和签名设计",size:"800 MB",date:"2026-05-20",link:"https://pan.baidu.com/s/xxxxx_handwrite",downloads:1340},
+  {id:18,name:"After Effects 表达式大全",cat:"视频模板",desc:"100+常用AE表达式预设，大幅提升动画制作效率",size:"2.5 GB",date:"2026-05-19",link:"https://pan.baidu.com/s/xxxxx_ae",downloads:2100},
+  {id:19,name:"Figma 插件开发指南",cat:"文档教程",desc:"从零开始开发Figma插件，含完整源码和部署教程",size:"150 MB",date:"2026-05-19",link:"https://pan.baidu.com/s/xxxxx_figma_plugin",downloads:456},
+  {id:20,name:"Docker + K8s 部署全攻略",cat:"工具软件",desc:"容器化部署从入门到生产环境，含配置文件和脚本",size:"3 GB",date:"2026-05-18",link:"https://pan.baidu.com/s/xxxxx_docker",downloads:1890}
+];
+
+const badgeClass = {"设计素材":"badge-design","源码":"badge-code","视频模板":"badge-video","文档教程":"badge-doc","工具软件":"badge-tool","字体":"badge-font","PPT模板":"badge-template"};
+let currentFilter = 'all';
+
+function renderGrid(data){
+  const grid = document.getElementById('resourceGrid');
+  if(data.length === 0){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:4rem;color:var(--muted)">没有找到匹配的资源</div>';return}
+  grid.innerHTML = data.map(r=>`
+    <div class="resource-card" onclick="openModal(${r.id})">
+      <span class="cloud-icon">☁️</span>
+      <span class="badge ${badgeClass[r.cat]||'badge-other'}">${r.cat}</span>
+      <h3>${r.name}</h3>
+      <p>${r.desc}</p>
+      <div class="meta">
+        <span class="size">${r.size}</span>
+        <span class="date">${r.date}</span>
+      </div>
+      <div class="actions">
+        <button class="btn-sm btn-primary" onclick="event.stopPropagation();window.open('${r.link}','_blank')">☁️ 转存</button>
+        <button class="btn-sm btn-outline" onclick="event.stopPropagation();openModal(${r.id})">  详情</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterResources(){
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  let filtered = resources;
+  if(currentFilter !== 'all') filtered = filtered.filter(r=>r.cat===currentFilter);
+  if(q) filtered = filtered.filter(r=>r.name.toLowerCase().includes(q)||r.desc.toLowerCase().includes(q)||r.cat.includes(q));
+  renderGrid(filtered);
+}
+
+function setFilter(cat,btn){
+  currentFilter = cat;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  filterResources();
+}
+
+function openModal(id){
+  const r = resources.find(x=>x.id===id);
+  document.getElementById('modalTitle').textContent = r.name;
+  document.getElementById('modalDesc').textContent = r.desc;
+  document.getElementById('modalTags').innerHTML = `<span class="badge ${badgeClass[r.cat]||'badge-other'}">${r.cat}</span><span style="color:var(--muted);font-size:0.85rem"> ${r.size} · ${r.downloads} 次转存</span>`;
+  document.getElementById('modalLink').textContent = r.link;
+  document.getElementById('modal').classList.add('show');
+}
+
+function closeModal(){document.getElementById('modal').classList.remove('show')}
+
+function copyLink(){
+  const link = document.getElementById('modalLink').textContent;
+  navigator.clipboard.writeText(link).then(()=>{
+    const t=document.getElementById('toast');t.style.display='block';setTimeout(()=>t.style.display='none',2000);
+  });
+}
+
+// Stats animation
+function animateNum(el,target){let c=0;const step=Math.ceil(target/40);const timer=setInterval(()=>{c+=step;if(c>=target){c=target;clearInterval(timer)}el.textContent=c.toLocaleString()},30)}
+animateNum(document.getElementById('totalCount'),resources.length);
+animateNum(document.getElementById('catCount'),[...new Set(resources.map(r=>r.cat))].length);
+animateNum(document.getElementById('todayCount'),1);
+
+renderGrid(resources);
+</script>
+</body>
+</html>

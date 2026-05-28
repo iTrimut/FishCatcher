@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>界面二 · 资源整理服务平台</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0c0c1d;--card:#141432;--card2:#1a1a3e;--border:rgba(255,255,255,0.06);--purple:#8b5cf6;--pink:#d946ef;--purple-glow:rgba(139,92,246,0.2);--text:#e5e7eb;--muted:#6b7280;--success:#22c55e;--warning:#f59e0b}
+body{font-family:'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* Nav */
+.topnav{position:sticky;top:0;z-index:100;background:rgba(12,12,29,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:60px}
+.topnav .logo{font-size:1.2rem;font-weight:700;display:flex;align-items:center;gap:8px}
+.topnav .logo span{background:linear-gradient(135deg,var(--purple),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-right{display:flex;gap:1rem;align-items:center}
+.back-link{color:var(--purple);text-decoration:none;font-size:0.85rem}
+
+/* Layout */
+.layout{display:grid;grid-template-columns:260px 1fr 320px;min-height:calc(100vh - 60px)}
+
+/* Sidebar */
+.sidebar{background:rgba(0,0,0,0.2);border-right:1px solid var(--border);padding:1.5rem;overflow-y:auto}
+.sidebar h3{font-size:0.75rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:1rem}
+.sidebar .menu-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;transition:all 0.2s;margin-bottom:4px;font-size:0.9rem;color:var(--muted)}
+.sidebar .menu-item:hover{background:rgba(255,255,255,0.04);color:var(--text)}
+.sidebar .menu-item.active{background:var(--purple-glow);color:#fff}
+.sidebar .menu-item .count{margin-left:auto;font-size:0.75rem;background:rgba(255,255,255,0.06);padding:2px 8px;border-radius:10px}
+.sidebar .section{margin-bottom:2rem}
+
+/* Main */
+.main{padding:2rem;overflow-y:auto}
+.main-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;flex-wrap:wrap;gap:1rem}
+.main-header h1{font-size:1.6rem;color:#fff}
+.view-toggle{display:flex;gap:0.5rem}
+.view-btn{padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:0.85rem;transition:all 0.2s}
+.view-btn.active{background:var(--purple);color:#fff;border-color:var(--purple)}
+
+/* Service Cards */
+.services{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;margin-bottom:2rem}
+.service-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.5rem;transition:all 0.3s}
+.service-card:hover{border-color:rgba(139,92,246,0.3);transform:translateY(-2px)}
+.service-card .icon{font-size:2rem;margin-bottom:0.8rem}
+.service-card h3{color:#fff;font-size:1rem;margin-bottom:0.5rem}
+.service-card p{color:var(--muted);font-size:0.85rem;line-height:1.6;margin-bottom:1rem}
+.service-card .price{font-size:1.3rem;font-weight:700;color:var(--purple)}
+.service-card .price small{font-size:0.75rem;color:var(--muted);font-weight:400}
+
+/* Table */
+.table-wrap{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.table-header{display:flex;justify-content:space-between;align-items:center;padding:1.2rem 1.5rem;border-bottom:1px solid var(--border)}
+.table-header h3{color:#fff;font-size:1rem}
+.badge-count{background:var(--purple-glow);color:var(--purple);padding:3px 10px;border-radius:10px;font-size:0.8rem}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:12px 16px;font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);border-bottom:1px solid var(--border);font-weight:600}
+td{padding:12px 16px;font-size:0.88rem;border-bottom:1px solid rgba(255,255,255,0.03)}
+tr:hover td{background:rgba(255,255,255,0.02)}
+.status{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;font-size:0.78rem;font-weight:500}
+.status-done{background:rgba(34,197,94,0.12);color:#4ade80}
+.status-progress{background:rgba(245,158,11,0.12);color:#fbbf24}
+.status-pending{background:rgba(107,114,128,0.12);color:#9ca3af}
+.status-dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.priority-high{color:#ef4444}
+.priority-mid{color:#f59e0b}
+.priority-low{color:#22c55e}
+
+/* Right Panel */
+.right-panel{background:rgba(0,0,0,0.2);border-left:1px solid var(--border);padding:1.5rem;overflow-y:auto}
+.right-panel h3{font-size:0.75rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:1rem}
+.workflow-step{display:flex;gap:12px;margin-bottom:1.2rem;position:relative}
+.workflow-step::before{content:'';position:absolute;left:15px;top:32px;bottom:-12px;width:2px;background:var(--border)}
+.workflow-step:last-child::before{display:none}
+.step-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.8rem;flex-shrink:0}
+.step-active{background:var(--purple);color:#fff}
+.step-done{background:rgba(34,197,94,0.15);color:var(--success)}
+.step-pending{background:rgba(255,255,255,0.05);color:var(--muted)}
+.step-info h4{color:#fff;font-size:0.9rem;margin-bottom:2px}
+.step-info p{color:var(--muted);font-size:0.8rem;line-height:1.5}
+
+.auth-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.2rem;margin-top:1.5rem}
+.auth-card h4{color:#fff;font-size:0.95rem;margin-bottom:0.8rem}
+.auth-item{display:flex;align-items:center;gap:8px;padding:8px 0;font-size:0.85rem;color:var(--muted)}
+.auth-item .check{color:var(--success)}
+.auth-item .pending{color:var(--warning)}
+
+.stat-mini{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:1rem;margin-bottom:0.8rem}
+.stat-mini .label{font-size:0.75rem;color:var(--muted);margin-bottom:4px}
+.stat-mini .value{font-size:1.3rem;font-weight:700;color:#fff}
+.stat-mini .change{font-size:0.75rem;margin-left:6px}
+.change-up{color:var(--success)}
+.change-down{color:#ef4444}
+
+/* Add Modal */
+.add-modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:200;justify-content:center;align-items:center}
+.add-modal.show{display:flex}
+.add-modal .modal{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2rem;max-width:550px;width:90%}
+.add-modal .modal h2{color:#fff;margin-bottom:1.5rem}
+.add-modal .close{position:absolute;top:1rem;right:1.5rem;background:none;border:none;color:var(--muted);font-size:1.5rem;cursor:pointer}
+.form-group{margin-bottom:1.2rem}
+.form-group label{display:block;font-size:0.85rem;color:var(--muted);margin-bottom:6px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 14px;background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:10px;color:#fff;font-size:0.9rem;outline:none;transition:border 0.2s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--purple)}
+.form-group textarea{resize:vertical;min-height:80px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.btn-submit{width:100%;padding:12px;background:linear-gradient(135deg,var(--purple),var(--pink));color:#fff;border:none;border-radius:10px;font-size:0.95rem;font-weight:600;cursor:pointer;transition:opacity 0.2s}
+.btn-submit:hover{opacity:0.9}
+
+.fab{position:fixed;bottom:2rem;right:2rem;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--pink));color:#fff;border:none;font-size:1.5rem;cursor:pointer;box-shadow:0 4px 20px rgba(139,92,246,0.4);transition:transform 0.2s;z-index:50}
+.fab:hover{transform:scale(1.1)}
+
+@media(max-width:1024px){.layout{grid-template-columns:1fr}.sidebar,.right-panel{display:none}}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="logo"> <span>资源整理服务</span></div>
+  <div class="nav-right">
+    <a class="back-link" href="index.html">← 返回入口</a>
+  </div>
+</nav>
+
+<div class="layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="section">
+      <h3>工作台</h3>
+      <div class="menu-item active" onclick="showView('overview')"> <span>总览</span></div>
+      <div class="menu-item" onclick="showView('tasks')"> <span>整理任务</span><span class="count" id="taskCount">6</span></div>
+      <div class="menu-item" onclick="showView('services')"> <span>服务项目</span></div>
+      <div class="menu-item" onclick="showView('auth')"> <span>授权管理</span></div>
+    </div>
+    <div class="section">
+      <h3>分类</h3>
+      <div class="menu-item"> <span>设计素材</span><span class="count">128</span></div>
+      <div class="menu-item"> <span>源码项目</span><span class="count">86</span></div>
+      <div class="menu-item"> <span>视频模板</span><span class="count">204</span></div>
+      <div class="menu-item"> <span>文档教程</span><span class="count">156</span></div>
+      <div class="menu-item"> <span>工具软件</span><span class="count">92</span></div>
+      <div class="menu-item"> <span>字体素材</span><span class="count">67</span></div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main">
+    <div class="main-header">
+      <h1>资源整理工作台</h1>
+      <div class="view-toggle">
+        <button class="view-btn active" onclick="showView('overview')">概览</button>
+        <button class="view-btn" onclick="showView('tasks')">任务</button>
+      </div>
+    </div>
+
+    <!-- Overview View -->
+    <div id="viewOverview">
+      <!-- Service Cards -->
+      <div class="services">
+        <div class="service-card">
+          <div class="icon"> </div>
+          <h3>资源分类整理</h3>
+          <p>按类型、用途、质量进行专业分类，添加标签和描述</p>
+          <div class="price">¥29 <small>/100个资源</small></div>
+        </div>
+        <div class="service-card">
+          <div class="icon">✨</div>
+          <h3>质量筛选优化</h3>
+          <p>筛选高质量资源，淘汰低质重复内容，优化资源描述</p>
+          <div class="price">¥49 <small>/次整理</small></div>
+        </div>
+        <div class="service-card">
+          <div class="icon"> </div>
+          <h3>定制化资源包</h3>
+          <p>根据需求定制专属资源包，配套使用说明和推荐方案</p>
+          <div class="price">¥99 <small>/个定制包</small></div>
+        </div>
+        <div class="service-card">
+          <div class="icon"> </div>
+          <h3>授权合规审核</h3>
+          <p>检查资源版权状态，确认使用权限，确保合规分发</p>
+          <div class="price">¥19 <small>/50个资源</small></div>
+        </div>
+      </div>
+
+      <!-- Task Table -->
+      <div class="table-wrap">
+        <div class="table-header">
+          <h3>最近整理任务</h3>
+          <span class="badge-count">6 个任务</span>
+        </div>
+        <table>
+          <thead>
+            <tr><th>任务名称</th><th>分类</th><th>状态</th><th>优先级</th><th>进度</th></tr>
+          </thead>
+          <tbody id="taskTableBody">
+            <tr>
+              <td style="color:#fff;font-weight:500">Figma素材包整理</td>
+              <td>设计素材</td>
+              <td><span class="status status-done"><span class="status-dot"></span>已完成</span></td>
+              <td class="priority-high"> 高</td>
+              <td>100%</td>
+            </tr>
+            <tr>
+              <td style="color:#fff;font-weight:500">Python教程分类</td>
+              <td>文档教程</td>
+              <td><span class="status status-progress"><span class="status-dot"></span>进行中</span></td>
+              <td class="priority-mid"> 中</td>
+              <td>65%</td>
+            </tr>
+            <tr>
+              <td style="color:#fff;font-weight:500">PR转场包质量筛选</td>
+              <td>视频模板</td>
+              <td><span class="status status-progress"><span class="status-dot"></span>进行中</span></td>
+              <td class="priority-high"> 高</td>
+              <td>40%</td>
+            </tr>
+            <tr>
+              <td style="color:#fff;font-weight:500">字体版权审核</td>
+              <td>字体</td>
+              <td><span class="status status-pending"><span class="status-dot"></span>待开始</span></td>
+              <td class="priority-high"> 高</td>
+              <td>0%</td>
+            </tr>
+            <tr>
+              <td style="color:#fff;font-weight:500">Vue项目源码标注</td>
+              <td>源码</td>
+              <td><span class="status status-done"><span class="status-dot"></span>已完成</span></td>
+              <td class="priority-low"> 低</td>
+              <td>100%</td>
+            </tr>
+            <tr>
+              <td style="color:#fff;font-weight:500">PPT模板优化描述</td>
+              <td>PPT模板</td>
+              <td><span class="status status-pending"><span class="status-dot"></span>待开始</span></td>
+              <td class="priority-mid"> 中</td>
+              <td>0%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- Right Panel -->
+  <aside class="right-panel">
+    <h3>整理流程</h3>
+    <div class="workflow-step">
+      <div class="step-dot step-done">✓</div>
+      <div class="step-info"><h4>抓取资源</h4><p>从原始链接获取资源信息和元数据</p></div>
+    </div>
+    <div class="workflow-step">
+      <div class="step-dot step-done">✓</div>
+      <div class="step-info"><h4>分类打标</h4><p>按类型、用途、质量进行自动+人工分类</p></div>
+    </div>
+    <div class="workflow-step">
+      <div class="step-dot step-active">3</div>
+      <div class="step-info"><h4>质量审核</h4><p>筛选高质量资源，淘汰重复和低质内容</p></div>
+    </div>
+    <div class="workflow-step">
+      <div class="step-dot step-pending">4</div>
+      <div class="step-info"><h4>授权确认</h4><p>确认版权状态，获取使用授权</p></div>
+    </div>
+    <div class="workflow-step">
+      <div class="step-dot step-pending">5</div>
+      <div class="step-info"><h4>上架发布</h4><p>生成资源包，发布到销售平台</p></div>
+    </div>
+
+    <div class="auth-card">
+      <h4>授权状态</h4>
+      <div class="auth-item"><span class="check">✓</span> Figma社区资源 — 免费商用</div>
+      <div class="auth-item"><span class="check">✓</span> 开源项目 — MIT协议</div>
+      <div class="auth-item"><span class="pending">⏳</span> Adobe素材 — 待确认</div>
+      <div class="auth-item"><span class="pending">⏳</span> 字体版权 — 待审核</div>
+    </div>
+
+    <div style="margin-top:1.5rem">
+      <h3>数据统计</h3>
+      <div class="stat-mini">
+        <div class="label">本周整理量</div>
+        <div class="value">347 <span class="change change-up">↑ 23%</span></div>
+      </div>
+      <div class="stat-mini">
+        <div class="label">通过率</div>
+        <div class="value">89% <span class="change change-up">↑ 5%</span></div>
+      </div>
+      <div class="stat-mini">
+        <div class="label">待处理</div>
+        <div class="value">156 <span class="change change-down">↓ 12</span></div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- FAB -->
+<button class="fab" onclick="document.getElementById('addModal').classList.add('show')">+</button>
+
+<!-- Add Task Modal -->
+<div class="add-modal" id="addModal">
+  <div class="modal" style="position:relative">
+    <button class="close" onclick="document.getElementById('addModal').classList.remove('show')">&times;</button>
+    <h2>新建整理任务</h2>
+    <div class="form-group">
+      <label>任务名称</label>
+      <input type="text" placeholder="例如：设计素材包分类整理">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>资源分类</label>
+        <select>
+          <option>设计素材</option><option>源码</option><option>视频模板</option>
+          <option>文档教程</option><option>工具软件</option><option>字体</option><option>PPT模板</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>优先级</label>
+        <select>
+          <option>高</option><option selected>中</option><option>低</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>资源链接（百度网盘）</label>
+      <input type="text" placeholder="https://pan.baidu.com/s/xxxxx">
+    </div>
+    <div class="form-group">
+      <label>整理说明</label>
+      <textarea placeholder="描述整理要求和注意事项..."></textarea>
+    </div>
+    <button class="btn-submit" onclick="addTask()">创建任务</button>
+  </div>
+</div>
+
+<script>
+function showView(view){
+  document.querySelectorAll('.view-btn').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('viewOverview').style.display = view==='overview'?'block':'none';
+}
+
+function addTask(){
+  document.getElementById('addModal').classList.remove('show');
+  // 实际项目中这里会发送API请求
+  alert('任务已创建！可在任务列表中查看。');
+}
+
+// 点击modal外部关闭
+document.getElementById('addModal').addEventListener('click',function(e){
+  if(e.target===this) this.classList.remove('show');
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>资源管理平台 - 三合一入口</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;background:#0f0f23;color:#e0e0e0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden}
+.bg-particles{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0}
+.particle{position:absolute;border-radius:50%;background:rgba(99,102,241,0.15);animation:float 8s infinite ease-in-out}
+@keyframes float{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-30px) scale(1.1)}}
+.container{position:relative;z-index:1;text-align:center;padding:2rem}
+h1{font-size:2.8rem;background:linear-gradient(135deg,#6366f1,#a855f7,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:0.5rem;letter-spacing:2px}
+.subtitle{color:#9ca3af;font-size:1.1rem;margin-bottom:3rem}
+.cards{display:flex;gap:2rem;flex-wrap:wrap;justify-content:center;max-width:1200px}
+.card{width:340px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:2.5rem 2rem;cursor:pointer;transition:all 0.4s cubic-bezier(0.4,0,0.2,1);position:relative;overflow:hidden;text-decoration:none;color:inherit;display:block}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:20px 20px 0 0;transition:height 0.4s}
+.card:nth-child(1)::before{background:linear-gradient(90deg,#3b82f6,#06b6d4)}
+.card:nth-child(2)::before{background:linear-gradient(90deg,#8b5cf6,#d946ef)}
+.card:nth-child(3)::before{background:linear-gradient(90deg,#f59e0b,#ef4444)}
+.card:hover{transform:translateY(-8px);border-color:rgba(255,255,255,0.15);background:rgba(255,255,255,0.06)}
+.card:hover::before{height:4px}
+.card-icon{font-size:3rem;margin-bottom:1rem}
+.card h2{font-size:1.4rem;margin-bottom:0.8rem;color:#fff}
+.card p{color:#9ca3af;font-size:0.95rem;line-height:1.7}
+.card .tag{display:inline-block;padding:4px 12px;border-radius:20px;font-size:0.75rem;margin-top:1rem;font-weight:500}
+.card:nth-child(1) .tag{background:rgba(59,130,246,0.15);color:#60a5fa}
+.card:nth-child(2) .tag{background:rgba(139,92,246,0.15);color:#a78bfa}
+.card:nth-child(3) .tag{background:rgba(245,158,11,0.15);color:#fbbf24}
+.arrow{position:absolute;bottom:1.5rem;right:1.5rem;font-size:1.5rem;opacity:0;transition:all 0.3s}
+.card:hover .arrow{opacity:1;transform:translateX(4px)}
+footer{margin-top:3rem;color:#4b5563;font-size:0.85rem;position:relative;z-index:1}
+</style>
+</head>
+<body>
+
+<div class="bg-particles" id="particles"></div>
+
+<div class="container">
+  <h1>资源管理平台</h1>
+  <p class="subtitle">三个独立模块，覆盖从聚合到销售的完整链路</p>
+
+  <div class="cards">
+    <a class="card" href="aggregator.html">
+      <div class="card-icon"></div>
+      <h2>界面一 · 资源聚合导航站</h2>
+      <p>自动抓取、分类展示各类资源，支持搜索、筛选、标签管理，打造资源百科入口</p>
+      <span class="tag">聚合 · 导航 · 搜索</span>
+      <span class="arrow">→</span>
+    </a>
+
+    <a class="card" href="organizer.html">
+      <div class="card-icon"></div>
+      <h2>界面二 · 资源整理服务平台</h2>
+      <p>对资源进行专业整理、分类、打标签，提供定制化整理服务，对接授权与合规流程</p>
+      <span class="tag">整理 · 分类 · 服务</span>
+      <span class="arrow">→</span>
+    </a>
+
+    <a class="card" href="dashboard.html">
+      <div class="card-icon"></div>
+      <h2>界面三 · 电商销售 + 可视化</h2>
+      <p>管理淘宝/闲鱼店铺链接，实时追踪订单、收入、利润，数据大屏一目了然</p>
+      <span class="tag">电商 · 订单 · 可视化</span>
+      <span class="arrow">→</span>
+    </a>
+  </div>
+
+  <footer>三个界面独立运行，数据互通 · 本地存储 · 无需后端</footer>
+</div>
+
+<script>
+const p=document.getElementById('particles');
+for(let i=0;i<20;i++){const d=document.createElement('div');d.className='particle';const s=Math.random()*80+20;d.style.cssText=`width:${s}px;height:${s}px;left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*8}s;animation-duration:${Math.random()*6+6}s`;p.appendChild(d)}
+</script>
+</body>
+</html>
