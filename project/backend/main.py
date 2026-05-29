@@ -434,6 +434,94 @@ def set_rule(product_id: int, platform: str, content: str, auto: bool = True):
 
 
 # ═══════════════════════════════════════
+# 百度网盘 API
+# ═══════════════════════════════════════
+
+@app.get("/api/baidu/status")
+def baidu_status():
+    """百度网盘授权状态"""
+    from baidu_pan import get_client
+    return get_client().get_status()
+
+@app.get("/api/baidu/auth-url")
+def baidu_auth_url():
+    """获取百度网盘授权链接"""
+    from baidu_pan import get_client
+    return {"auth_url": get_client().get_auth_url()}
+
+@app.post("/api/baidu/auth")
+def baidu_auth(code: str):
+    """用授权码完成百度网盘授权"""
+    from baidu_pan import get_client
+    return get_client().exchange_code(code)
+
+@app.get("/api/baidu/files")
+def baidu_list_files(path: str = "/", limit: int = 100):
+    """列出百度网盘文件"""
+    from baidu_pan import get_client
+    return get_client().list_files(path, limit=limit)
+
+@app.get("/api/baidu/search")
+def baidu_search(keyword: str, limit: int = 50):
+    """搜索百度网盘文件"""
+    from baidu_pan import get_client
+    return get_client().search_files(keyword, limit)
+
+@app.get("/api/baidu/quota")
+def baidu_quota():
+    """网盘容量"""
+    from baidu_pan import get_client
+    return get_client().get_quota()
+
+
+# ═══════════════════════════════════════
+# 支付 API（个人收款码）
+# ═══════════════════════════════════════
+
+@app.get("/api/payment/config")
+def get_payment_config():
+    """获取支付配置"""
+    from payment import load_config
+    return load_config()
+
+@app.post("/api/payment/config")
+def update_payment_config(wechat_qr: str = "", alipay_qr: str = "", contact_wechat: str = "", contact_qq: str = "", notice: str = ""):
+    """更新支付配置"""
+    from payment import load_config, save_config
+    config = load_config()
+    if wechat_qr: config["wechat_qr"] = wechat_qr
+    if alipay_qr: config["alipay_qr"] = alipay_qr
+    if contact_wechat: config["contact_wechat"] = contact_wechat
+    if contact_qq: config["contact_qq"] = contact_qq
+    if notice: config["notice"] = notice
+    save_config(config)
+    return {"success": True}
+
+@app.get("/api/payment/request/{order_no}")
+def payment_request(order_no: str):
+    """生成支付请求（展示收款码）"""
+    from payment import create_payment_request
+    conn = get_db()
+    order = conn.execute("SELECT o.*, p.title as product_title FROM orders o LEFT JOIN products p ON o.product_id=p.id WHERE o.order_no=?", (order_no,)).fetchone()
+    conn.close()
+    if not order:
+        raise HTTPException(404, "订单不存在")
+    return create_payment_request(order_no, order["amount"], order["product_title"])
+
+@app.post("/api/payment/confirm/{order_no}")
+def payment_confirm(order_no: str):
+    """确认收款并自动发货"""
+    from payment import confirm_payment
+    return confirm_payment(order_no)
+
+@app.get("/api/payment/pending")
+def payment_pending():
+    """待确认收款列表"""
+    from payment import get_pending_payments
+    return get_pending_payments()
+
+
+# ═══════════════════════════════════════
 # 系统 API
 # ═══════════════════════════════════════
 
