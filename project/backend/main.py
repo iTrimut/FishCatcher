@@ -473,6 +473,16 @@ def baidu_quota():
     from baidu_pan import get_client
     return get_client().get_quota()
 
+@app.post("/api/baidu/sync")
+def baidu_sync(path: str = "/我的资源"):
+    """同步百度网盘资源到数据库"""
+    from sync_pan import scan_and_sync
+    resources = scan_and_sync(path)
+    categories = {}
+    for r in resources:
+        categories[r['category']] = categories.get(r['category'], 0) + 1
+    return {"total": len(resources), "categories": categories}
+
 
 # ═══════════════════════════════════════
 # 支付 API（个人收款码）
