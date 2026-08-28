@@ -1,0 +1,15 @@
+name: test
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1 # 只拉最新 commit：仓库历史里曾提交过 venv（几百 MB），必须跳过
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install pytest
+      - run: python -m pytest project/backend/tests -q
