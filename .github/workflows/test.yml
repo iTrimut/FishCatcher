@@ -11,5 +11,5 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: pip install pytest
+      - run: pip install pytest requests beautifulsoup4 lxml
       - run: python -m pytest project/backend/tests -q
